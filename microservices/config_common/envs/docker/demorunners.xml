@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data>
+
+  <commands>
+    <command>start</command>
+    <command>stop</command>
+    <command>restart</command>
+    <command>ping</command>
+  </commands>
+
+
+  <demorunner name="dr1">
+    <module>demorunner</module>
+    <server>ipoldevel_nginx_1</server>
+    <capability>DEBIAN_STABLE</capability>
+    <!--<capability>Matlab</capability>-->
+    <serverSSH>localhost</serverSSH>
+    <path>~/ipolDevel/ipol_demo/modules/demorunner/</path>
+  </demorunner>
+  
+  <demorunner name="dr2">
+    <module>demorunner</module>
+    <server>ipoldevel_nginx_1</server>
+    <capability>DEBIAN_STABLE</capability>
+    <capability>Matlab</capability>
+    <serverSSH>localhost</serverSSH>
+    <path>~/ipolDevel/ipol_demo/modules/demorunner/</path>
+  </demorunner>
+
+</data>

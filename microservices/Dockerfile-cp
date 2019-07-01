@@ -1,0 +1,44 @@
+FROM debian:stable
+
+# ipol user config
+RUN useradd -ms /bin/zsh ipol
+RUN adduser ipol sudo
+RUN echo 'ipol:ipol' | chpasswd
+
+WORKDIR /home/ipol
+
+# Apt and pip packages installation
+COPY ./ipol_webapp/requirements.txt /home/ipol/cp_requirements.txt
+RUN apt update && apt install -y python python2.7 python-dev python-pip
+RUN pip install -r cp_requirements.txt && pip3 install requests virtualenv ipython
+
+
+# FROM debian:stable
+
+# WORKDIR /root
+
+# # Apt and pip packages installation
+# RUN apt update && apt install -y python python-pip
+
+# COPY ./ipol_webapp/requirements.txt cp_requirements.txt
+# RUN pip install -r cp_requirements.txt && pip install requests virtualenv ipython
+
+# EXPOSE 80
+
+# CMD export PATH=$VIRTUAL_ENV:$PATH; cd $MODULE_PATH && ./main.py
+
+FROM debian:stable
+ENV PYTHONUNBUFFERED 1
+
+# ipol user config
+RUN useradd -ms /bin/zsh ipol
+RUN adduser ipol sudo
+RUN echo 'ipol:ipol' | chpasswd
+
+WORKDIR /home/ipol
+
+# Apt and pip packages installation
+RUN apt update && apt install -y python python-pip
+
+COPY ./ipol_webapp/requirements.txt /home/ipol/cp_requirements.txt
+RUN pip install -r cp_requirements.txt && pip install requests virtualenv ipython

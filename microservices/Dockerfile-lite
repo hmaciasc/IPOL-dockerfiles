@@ -1,0 +1,14 @@
+FROM debian:stable
+
+WORKDIR /root
+
+# Apt and pip packages installation
+COPY ./docker/pkglist pkglist
+RUN apt update && apt install -y $(cat pkglist)
+
+COPY ./ipol_webapp/requirements.txt cp_requirements.txt
+RUN pip install -r cp_requirements.txt && pip3 install requests virtualenv ipython
+
+EXPOSE 80
+
+CMD export PATH=$VIRTUAL_ENV:$PATH; cd $MODULE_PATH && ./main.py

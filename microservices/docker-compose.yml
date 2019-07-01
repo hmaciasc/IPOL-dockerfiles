@@ -1,0 +1,150 @@
+version: '3.7'
+
+services:
+  core:
+    image: hmaciasc/ipol:lite
+    user: ipol
+    networks:
+      - ipol
+    volumes:
+      - .:/home/ipol/ipolDevel
+    environment:
+      - VIRTUAL_ENV=/home/ipol/ipolDevel/ipol_demo/modules/core/venv/bin
+      - MODULE_PATH=/home/ipol/ipolDevel/ipol_demo/modules/core
+    restart: on-failure
+    ports:
+      - "8080:8080"
+
+  archive:
+    image: hmaciasc/ipol:lite
+    user: ipol
+    networks:
+      - ipol
+    volumes:
+      - ./ipol_demo/modules/archive:/home/ipol/ipolDevel/ipol_demo/modules/archive
+      - ./ipol_demo/modules/config_common:/home/ipol/ipolDevel/ipol_demo/modules/config_common
+    environment:
+      - VIRTUAL_ENV=/home/ipol/ipolDevel/ipol_demo/modules/archive/venv/bin
+      - MODULE_PATH=/home/ipol/ipolDevel/ipol_demo/modules/archive
+    restart: on-failure
+    ports:
+      - "9000:9000"
+
+  blobs:
+    image: hmaciasc/ipol:lite
+    user: ipol
+    networks:
+      - ipol
+    volumes:
+      - ./ipol_demo/modules/blobs:/home/ipol/ipolDevel/ipol_demo/modules/blobs
+      - ./shared_folder:/home/ipol/ipolDevel/shared_folder
+      - ./ipol_demo/lib:/home/ipol/ipolDevel/ipol_demo/lib
+      - ./ipol_demo/modules/config_common:/home/ipol/ipolDevel/ipol_demo/modules/config_common
+    environment:
+      - VIRTUAL_ENV=/home/ipol/ipolDevel/ipol_demo/modules/blobs/venv/bin
+      - MODULE_PATH=/home/ipol/ipolDevel/ipol_demo/modules/blobs
+    restart: on-failure
+    ports:
+      - "9001:9001"
+
+  demoinfo:
+    image: hmaciasc/ipol:lite
+    user: ipol
+    networks:
+      - ipol
+    volumes:
+      - ./ipol_demo/modules/demoinfo:/home/ipol/ipolDevel/ipol_demo/modules/demoinfo
+      - ./shared_folder:/home/ipol/ipolDevel/shared_folder
+      - ./ipol_demo/modules/config_common:/home/ipol/ipolDevel/ipol_demo/modules/config_common
+    environment:
+      - VIRTUAL_ENV=/home/ipol/ipolDevel/ipol_demo/modules/demoinfo/venv/bin
+      - MODULE_PATH=/home/ipol/ipolDevel/ipol_demo/modules/demoinfo
+    restart: on-failure
+    ports:
+      - "9002:9002"
+
+  conversion:
+    image: hmaciasc/ipol:lite
+    user: ipol
+    networks:
+      - ipol
+    volumes:
+      - ./ipol_demo/modules/conversion:/home/ipol/ipolDevel/ipol_demo/modules/conversion
+      - ./shared_folder:/home/ipol/ipolDevel/shared_folder
+      - ./ipol_demo/lib:/home/ipol/ipolDevel/ipol_demo/lib
+      - ./ipol_demo/modules/config_common:/home/ipol/ipolDevel/ipol_demo/modules/config_common
+    environment:
+      - VIRTUAL_ENV=/home/ipol/ipolDevel/ipol_demo/modules/conversion/venv/bin
+      - MODULE_PATH=/home/ipol/ipolDevel/ipol_demo/modules/conversion
+    restart: on-failure
+    ports:
+      - "9003:9003"
+
+  demorunner:
+    image: hmaciasc/ipol:lite
+    user: ipol
+    networks:
+      - ipol
+    volumes:
+      - ./ipol_demo/modules/demorunner:/home/ipol/ipolDevel/ipol_demo/modules/demorunner
+      - ./shared_folder:/home/ipol/ipolDevel/shared_folder
+      - ./ipol_demo/modules/config_common:/home/ipol/ipolDevel/ipol_demo/modules/config_common
+    environment:
+      - VIRTUAL_ENV=/home/ipol/ipolDevel/ipol_demo/modules/demorunner/venv/bin
+      - MODULE_PATH=/home/ipol/ipolDevel/ipol_demo/modules/demorunner
+    restart: "no"
+    ports:
+      - "9004:9004"
+
+  dispatcher:
+    image: hmaciasc/ipol:lite
+    user: ipol
+    networks:
+      - ipol
+    volumes:
+      - ./ipol_demo/modules/dispatcher:/home/ipol/ipolDevel/ipol_demo/modules/dispatcher
+      - ./ipol_demo/modules/config_common:/home/ipol/ipolDevel/ipol_demo/modules/config_common
+    environment:
+      - VIRTUAL_ENV=/home/ipol/ipolDevel/ipol_demo/modules/dispatcher/venv/bin
+      - MODULE_PATH=/home/ipol/ipolDevel/ipol_demo/modules/dispatcher
+    restart: on-failure
+    ports:
+      - "9005:9005"
+
+  nginx:
+    image: hmaciasc/ipol-nginx:latest
+    command: ["nginx", "-g", "daemon off;"]
+    networks:
+      - ipol
+    volumes:
+      - ./ipol_demo/clientApp/:/home/ipol/ipolDevel/ipol_demo/clientApp
+      - ./ipol_demo/modules/:/home/ipol/ipolDevel/ipol_demo/modules/
+      - ./shared_folder:/home/ipol/ipolDevel/shared_folder
+      - ./gi_ipol/IPOLWEBAPP_MEDIA:/home/ipol/IPOLWEBAPP_MEDIA
+      - ./gi_ipol/IPOLWEBAPP_STATIC:/home/ipol/IPOLWEBAPP_STATIC
+    restart: on-failure
+    ports:
+      - "80:80"
+      - "443:443"
+
+  cp:
+    image: hmaciasc/ipol:lite
+    hostname: ipoldevel_cp
+    user: ipol
+    command: python ipolDevel/ipol_webapp/manage.py runserver 0.0.0.0:8000
+    networks:
+      ipol:
+        ipv4_address: 172.32.0.20
+    volumes:
+      - ./ipol_webapp:/home/ipol/ipolDevel/ipol_webapp
+      - ./ipol_demo/modules/config_common:/home/ipol/ipolDevel/ipol_demo/modules/config_common
+      - ./gi_ipol/IPOLWEBAPP_MEDIA:/home/ipol/IPOLWEBAPP_MEDIA
+      - ./gi_ipol/IPOLWEBAPP_STATIC:/home/ipol/IPOLWEBAPP_STATIC
+    ports:
+      - "8000:8000"
+
+networks:
+  ipol:
+    ipam:
+      config:
+      - subnet: 172.32.0.0/24
